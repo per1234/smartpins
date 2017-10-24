@@ -200,10 +200,12 @@ A "truth table" is not additonally informative in this case. Note that unlike al
 
 Positive logic timeline: [debounce]=15ms [timeout]=30000ms (30sec) [hysteresis]=2500ms (2.5sec)
 
-T=0|T=5|T=8|T=10|T=12|T=15|T=500|T=1500|T=31500|...|ignored until T=34000
----|---|---|----|----|----|-----|------|-------|---|---
-RAW|  1|  0|   1|   0|   1|    0|     1|      -|...|
-CKD|  -|  -|   -|   -|   1|    -|     -|      0|-|
+T=0|T=5|T=8|T=10|T=12|T=15|...|T=500|T=1500|T=31500|...|ignored until T=34000
+---|---|---|----|----|----|---|-----|------|-------|---|---
+RAW|  1|  0|   1|   0|   1|111|    0|     1|      -|...|-
+CKD|  -|  -|   -|   -|   1|---|    -|     -|      0|...|-
+ B | O | U |  N |  C |  E |Tmr|     |RET   |exp    | H |Active 
+   
 
 ## Getting Started
 
