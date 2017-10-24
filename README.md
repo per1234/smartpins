@@ -203,8 +203,8 @@ Positive logic timeline: [debounce]=15ms [timeout]=30000ms (30sec) [hysteresis]=
 T=0|T=5|T=8|T=10|T=12|T=15|...|T=500|T=1500|T=31500|...|ignored until T=34000
 ---|---|---|----|----|----|---|-----|------|-------|---|---
 RAW|  1|  0|   1|   0|   1|111|    0|     1|      -|...|-
-CKD|  -|  -|   -|   -|   1|---|    -|     -|      0|...|-
- B | O | U |  N |  C |  E |Tmr|     |RET   |exp    | H |Active 
+COOKED|  -|  -|   -|   -|   1|---|    -|     -|      0|...|-
+ B | O | U |  N |  C |  E |T start|     |T retrig   |T expire    |Dead|Alive
    
 
 ## Getting Started
