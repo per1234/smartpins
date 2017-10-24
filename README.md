@@ -24,6 +24,20 @@ void loop() {
   SP.loop();
 }
 ```
+# Supported Hardware
+
+**SmartPins** has been tested on the following hardware:
+
+* ESP-01
+* ESP-01S
+* Sonoff Basic
+* Sonoff S20
+* Sonoff SV
+* Wemos D1 mini
+* Nodedmuc v0.9
+
+There is no reason why it shouldn't run on any other ESP8266 boards
+
 # In detail / additional functionality
 
 **SmartPins** provides much more than just debouncing: it has numerous different input styles and - more importanly it puts all asynchronous input events into a single queue. This makes sure that all your code runs from the main loop thread, which reduces / prevents a number of common problems.
@@ -77,20 +91,6 @@ N is the number of milliseconds debounce time.
 ... represents any subsequent transitions (i.e. bounces)
 For the sake of convenience, positive logic has been chosen but if the pin were pulled up, the table would just have all the 1s and 0s reversed.
 
-# Supported Hardware
-
-**SmartPins** has been tested on the following hardware:
-
-* ESP-01
-* ESP-01S
-* Sonoff Basic
-* Sonoff S20
-* Sonoff SV
-* Wemos D1 mini
-* Nodedmuc v0.9
-
-There is no reason why it shouldn't run on any other ESP8266 boards
-
 # Pin types
 
 ## 1. **RAW**
@@ -133,7 +133,7 @@ timer fires|1
 ...|...
 timer fires|0
 
-4. **TIMED**
+## 4. **TIMED**
 
 Based on a debounced pin (for N ms). Callback returns the current state AND the number of milliseconds that pin was held in the changed state
 
@@ -153,7 +153,7 @@ e.g. 1438ms elapse*|...|...
 
 * **NB** debouncing complication not shown
 
-5. **REPORTING**
+## 5. **REPORTING**
 
 Based on a timed pin (for N ms). Callback returns the current state AND the number of milliseconds that pin was held in the changed state for every amount of "frequency" parameter.
 
@@ -173,7 +173,7 @@ e.g. 438ms elapse*|...|...
 
 * **NB** debouncing complication not shown
 
-6. **LATCHING**
+## 6. **LATCHING**
 
 Based on a debounced pin. Turns a momentary button/switch into a latching button/switch
 
@@ -189,7 +189,7 @@ any amount of time elapses...|...
 ...|ignored for N ms
 0|0
 
-7. **RETRIGGERED**
+## 7. **RETRIGGERED**
 
 Based on a debounced pin. After first change, will call back only after [timeout] ms have elapsed. If subsequent "triggering" transitions occur before [timeout] has expired, then the internal timer is restarted. Thus the "untriggered" state can only ever occur <timeout> ms after the last (or only) inital trigger event. It also has an additional hysteresis timer (which can be zero) - this is the "deadzone" time between triggers, i.e. the pin will not react again after the previous "untrigger" until [hysteresis] ms have elapsed. 
 
@@ -206,11 +206,11 @@ RAW|  1|  0|   1|   0|   1|111|    0|     1|      -|ignored|-
 COOKED|  -|  -|   -|   -|   1|---|    -|     -|      0|ignored|-
  B | O | U |  N |  C |  E |TRIG|     |RETRIG|EXPIRE|Dead|Active
  
- 9. **ENCODER**
+ ## 8. **ENCODER**
  
 Manages a standard rotary encoder. It will of course require *two* pins. For types that also include a push switch, a third (probably a debounced type) may also be added separately. Decodes dual input signals and calls back with +1 or -1 when a clockwise or anticlockwise "click" occurs. If this is the "wrong" sense for your application, simply reverese the two pin definitions.
 
-10. **ENCODERAUTO**
+## 9. **ENCODERAUTO**
 
 Based on an encoder, callback returns an absolute value representing the position. You provide four additional parameters Vmin, Vmax, Vset and Vinc. Vmin is the minimum value the pin(s) will return, Vmax  the maximum and Vset is where you require the "current" position to be. Obviously, at all times, Vset must be between Vmin and Vmax. Vinc is the amount by which the encoder increments (or decrements) with each click. Defaults are Vmin=0, Vmax=100, Vset=50, i.e. the mid-point and Vinc=1. One click anticlockwise will callback with 49, 1 clicks clockwise will callback with 51
 
