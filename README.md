@@ -42,15 +42,15 @@ It also includes "hooks" which allow the user to do things like this, monitoring
 
 ![esparto](/assets/esparto.png)
 
-# In detail / additional functionality
+## In detail / additional functionality
 
 While you can use **smartpins** "out-of-the-box" as in the example above, it helps to understand two concepts:
 
-1) It is an extension of the H4 timer/scheduler library (https://github.com/philbowles/h4) so it provides all the functions of that library in addition to the pin management. These include fleibla and adaptable timing functions that can call class methods or std:;functions when they "fire"
+1) It is an extension of the H4 timer/scheduler library (https://github.com/philbowles/h4) so it provides all the functions of that library in addition to the pin management. These include flexible and adaptable timing functions that can call class methods or `std::function`s when the timer "fires".
 
 2) It introduces the concept or "raw" and "cooked" pin states. The "raw" state is the actual physical state of the pin in a close as possible to real-time. All the managed pins are polled as fast as the processor allows - during testing on a variety of hardware (see list below) running at CPU speed 80MHz this is typically about 40000 times per second, or about every 25us. So while it is not as "instantaneous" as an interrupt, it works for the majority of popular hardware types. This is why the phrase "near real-time" is used here. On the plus side, it removes the need to worry about Interrupt Service Routines (ISR) and the complexities / common errors that they bring.
 
-The "cooked" state has a different meaning for each different pin type
+The "cooked" state has a different meaning for each different pin type.
 
 # "Raw" vs "cooked"
 
@@ -62,16 +62,67 @@ Back to the real world: the above is only true with an ideal switch that never b
 
 Referring back to the image of the LED monitor above, the top row of LEDs shows the "raw" state and the bottom row is "cooked". If you had a latching pin defined, the top "raw" LED would flicker on/off (usually at least once, due to the bouncing) as you press and release it, but the bottom "cooked" LED will stay on. Later, when you repeat this, the raw pin will again flicker on/off but now the cooked pin will go off.
 
-RAW COOKED
-1
-0 1
-1
-0 0
+A "truth table" for a latching pin would look something like this:
+
+RAW| COOKED
+---|---
+1| -
+...|ignored for N ms
+0|1
+1|-
+...|ignored for N ms
+0|0
+
+N is the number of milliseconds debounce time.
+... represents any subsequent transitions (i.e. bounces)
+For the sake of convenience, positive logic has been chosen but if the pin were pulled up, the table would just have all the 1s and 0s reversed.
+
+## Pin types
+
+1. RAW
+
+As the name suggests, there are no "cooked" events - the callback runs on every* transition of the pin. Callback parameter is current state: 1 or 0.
+
+RAW| COOKED
+---|---
+1|-
+0|-
+
+2. DEBOUNCED
+
+Ignores "bouncy" transitions for a period of N ms. Thus the pin has to stay in the changed state for at least N ms before a cooked event will fire.
+
+Typical usage: Standard input pushbutton or switch, requiring near-instant action.
+
+RAW| COOKED
+---|---
+1| -
+...|ignored for N ms
+1|1
+0|-
+...|ignored for N ms
+0|0
+
+3. POLLED
+
+Callback fires on a timer, returning instantaneous state: for digital pins this will be 0|1, for A0 it will be the absolute current ADC reading. Transitions in between timer "ticks" will be ignored.
+
+Typical usage: Slow-changing sensors, e.g. daylight sensors, temperature sensors. POLLED pins have an additional parameter specifying an analog read vs the more common digital read. The fact that minor occasional transitions in between ticks are ignored is useful for adding "hysteres" to the pin or "smoothing out" minor wobbles.
+
+RAW| COOKED
+---|---
+1|-
+timer fires|1
+0|-
+1|-
+0|-
+...|...
+timer fires|0
 
 
-# Getting Started
+## Getting Started
 
-## Prerequisites
+# Prerequisites
 
 **smartPins** relies upon the H4 timer/scheduler library, which must be installed first:
 
@@ -82,7 +133,7 @@ Numerous tutorials exists explaing how to intall libraries into your Arduino IDE
 * https://www.baldengineer.com/installing-arduino-library-from-github.html
 * http://skaarhoj.com/wiki/index.php/Steps_to_install_an_Arduino_Library_from_GitHub
 
-# API reference
+## API reference
 
 N.B. You must call the smartPins `loop()` function from within the main loop of your program as often as possible
 
