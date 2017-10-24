@@ -42,7 +42,7 @@ It also includes "hooks" which allow the user to do things like this, monitoring
 
 ![esparto](/assets/esparto.png)
 
-## In detail / additional functionality
+# In detail / additional functionality
 
 While you can use **smartpins** "out-of-the-box" as in the example above, it helps to understand two concepts:
 
@@ -52,7 +52,7 @@ While you can use **smartpins** "out-of-the-box" as in the example above, it hel
 
 The "cooked" state has a different meaning for each different pin type.
 
-# "Raw" vs "cooked"
+## "Raw" vs "cooked"
 
 Perhaps the easiest pin type to explain this is the "Latching" pin. A "latch" is something that stays in one state until it is commanded to change to another. Imagine then that you only have a simple and cheap "tactile" or "tact" momentary push button. The first issue is that they "bounce" - usually rather a lot. Imagine also you want one press of the button to turn an LED on and a second (later) press to turn it off.
 
@@ -77,7 +77,7 @@ N is the number of milliseconds debounce time.
 ... represents any subsequent transitions (i.e. bounces)
 For the sake of convenience, positive logic has been chosen but if the pin were pulled up, the table would just have all the 1s and 0s reversed.
 
-## Supported Hardware
+# Supported Hardware
 
 **smartpins** has been tested on the following hardware:
 
@@ -91,9 +91,9 @@ For the sake of convenience, positive logic has been chosen but if the pin were 
 
 There is no reason why it shouldn't run on any other ESP8266 boards
 
-## Pin types
+# Pin types
 
-1. **RAW**
+## 1. **RAW**
 
 As the name suggests, there are no "cooked" events - the callback runs on every* transition of the pin. Callback parameter is current state: 1 or 0.
 
@@ -102,7 +102,7 @@ RAW| COOKED
 1|-
 0|-
 
-2. **DEBOUNCED**
+## 2. **DEBOUNCED**
 
 Ignores "bouncy" transitions for a period of N ms. Thus the pin has to stay in the changed state for at least N ms before a cooked event will fire.
 
@@ -117,7 +117,7 @@ RAW| COOKED
 ...|ignored for N ms
 0|0
 
-3. **POLLED**
+## 3. **POLLED**
 
 Callback fires on a timer, returning instantaneous state: for digital pins this will be 0|1, for A0 it will be the absolute current ADC reading. Transitions in between timer "ticks" will be ignored.
 
@@ -216,9 +216,9 @@ Based on an encoder, callback returns an absolute value representing the positio
 
 Vmin, Vmax may be -ve. The encoder will function as long as the numerical condition Vmin < Vset < Vmax holds true. Thus as an example, imagine an encoderauto pin-pair with Vmin=-273 Vmax=0 Vset=-100 and Vinc=10. One click anticlockwise will callback with -110 and one click clockwise will callback with -90. If the clockwise rotation is continued, callbacks will occur with -80, -70, -60, -50, -40, -30, -20, -10, 0, 0, 0, 0.....  
 
-#Getting Started
+# Getting Started
 
-##Prerequisites
+## Prerequisites
 
 **smartPins** relies upon the H4 timer/scheduler library, which must be installed first:
 
@@ -229,7 +229,7 @@ Numerous tutorials exists explaing how to intall libraries into your Arduino IDE
 * https://www.baldengineer.com/installing-arduino-library-from-github.html
 * http://skaarhoj.com/wiki/index.php/Steps_to_install_an_Arduino_Library_from_GitHub
 
-#API reference
+# API reference
 
 **N.B.** You must call the smartPins `loop()` function from within the main loop of your program as often as possible. This runs the underlying H4 scheduler. Without this call, nothing will happen! Also, if your won loop or other code causes long delays, the pin timings will suffer. **smartpins** should ideally be deployed in applications that use only itself and the timer callbacks to run all code, avoiding any use of `delay()` calls. When used correctly, **smartpins** removes the need to ever call `delay()`. Avoid it like the plague.
 
@@ -237,7 +237,7 @@ Important note:
 
 You do **NOT** need to call the Arduino pinMode() function. **smartpins** does this for you already.
 
-##Inherited from H4:
+## Inherited from H4:
 
 H4_STD_FN is shorthand for `std::function<void(void)>`
 
@@ -256,7 +256,7 @@ All of the above may be called as methods of a SmartPins object, i.e. you do not
 
 **N.B.** See https://github.com/philbowles/h4 for full description of timer / scheduler calls
 
-##Directly from SmartPins
+## Directly from SmartPins
 ```c++
 
 SMARTPIN_STATE is defined as function<void(int)>
