@@ -198,11 +198,12 @@ Typical usage: PIR sensors. Although a typical PIR sensor will have these funtio
 Notes:
 A "truth table" is not additonally informative in this case. Note that unlike all the other pins types, a retriggering pin needs to know the difference between "on" and "off", "triggered" and "quiet". This is die to the fact that the device may indeed be in the "triggered" state at boot time (especially if that is performed manually). Since **smartpins** reacts to *changes* in state, if a PIR is already triggered at boot time, and **smartpins** is not aware, then all subsequent events will be interpreted "the wrong way round" and the timing sequence will be reversed. Thus an additional input parameter is required HIGH or LOW. A retriggered pin will ignore the first transition that is oposite in sense to this parameter. i.e. if the PIR is positive logic, provide a HIGH parameter...if it is already triggered HIGH at boot time, the 1st transiton will be to LOW and thus ignored.
 
-Positive logic timeline:
+Positive logic timeline: <timeout>=30000ms (30sec) <hysteresis>=2500ms (2.5sec)
 
-RAW|0
----|---
-COOKED|-
+T=0|T=25|T=28|T=32|T=40|T=1500|T=31500|
+---|---|---|---|---|---|---
+RAW|0|1|0|1|0|1
+COOKED|-|-|1|-|-|-|0
 
 ## Getting Started
 
