@@ -208,20 +208,13 @@ COOKED|  -|  -|   -|   -|   1|---|    -|     -|      0|ignored|-
  
  9. **ENCODER**
  
-Manages a standard rotary encoder. It will of course require *two* pins. For types that also include a push switch, a third (probably a debounced type) may also be added separately. Decodes dual input signals and calls back with +1 or -1 when a clockwise or anitclockwise "click" occurs. If this is the "wrong" sense for your application, simply reverese the two pin definitions.
+Manages a standard rotary encoder. It will of course require *two* pins. For types that also include a push switch, a third (probably a debounced type) may also be added separately. Decodes dual input signals and calls back with +1 or -1 when a clockwise or anticlockwise "click" occurs. If this is the "wrong" sense for your application, simply reverese the two pin definitions.
 
-A *very* simplistic (and bounce-ignored) truth table:
+10. **ENCODERAUTO**
 
-RAW A|RAW B|COOKED
-1|1| 
-1|0| 
-0|1| 
-0|0|+1
-1|0| 
-0|1| 
-1|1|-1
+Based on an encoder, callback returns an absolute value representing the position. You provide four additional parameters Vmin, Vmax, Vset and Vinc. Vmin is the minimum value the pin(s) will return, Vmax  the maximum and Vset is where you require the "current" position to be. Obviously, at all times, Vset must be between Vmin and Vmax. Vinc is the amount by which the encoder increments (or decrements) with each click. Defaults are Vmin=0, Vmax=100, Vset=50, i.e. the mid-point and Vinc=1. One click anticlockwise will callback with 49, 1 clicks clockwise will callback with 51
 
-
+Vmin, Vmax may be -ve. The encoder will function as long as the numerical condition Vmin < Vset < Vmax holds true. Thus as an example, imagine an encoderauto pin-pair with Vmin=-273 Vmax=0 Vset=-100 and Vinc=10. One click anticlockwise will callback with -110 and one click clockwise will callback with -90. If the clockwise rotation is continued, callbacks will occur with -80, -70, -60, -50, -40, -30, -20, -10, 0, 0, 0, 0.....  
 
 ## Getting Started
 
@@ -238,9 +231,60 @@ Numerous tutorials exists explaing how to intall libraries into your Arduino IDE
 
 ## API reference
 
-N.B. You must call the smartPins `loop()` function from within the main loop of your program as often as possible
+**N.B.** You must call the smartPins `loop()` function from within the main loop of your program as often as possible. This runs the underlying H4 scheduler. Without this call, nothing will happen! Also, if your won loop or other code causes long delays, the pin timings will suffer. **smartpins** should ideally be deployed in applications that use only itself and the timer callbacks to run all code, avoiding any use of `delay()` calls. When used correctly, **smartpins** removes the need to ever call `delay()`. Avoid it like the plague.
 
+Important note:
 
+You do **NOT** need to call the Arduino pinMode() function. **smartpins** does this for you already.
+
+#Inherited from H4:
+
+H4_STD_FN is shorthand for `std::function<void(void)>`
+
+```c++
+	H4_TIMER	every(uint32_t msec,H4_STD_FN fn);
+	H4_TIMER	everyRandom(uint32_t Rmin,uint32_t Rmax,H4_STD_FN fn);
+	void 		never();
+	void 		never(H4_TIMER uid);
+	H4_TIMER 	nTimes(uint32_t n,uint32_t msec,H4_STD_FN fn,H4_STD_FN chain=nullptr);
+	H4_TIMER 	nTimesRandom(uint32_t n,uint32_t msec,uint32_t Rmax,H4_STD_FN fn,H4_STD_FN chain=nullptr);
+	H4_TIMER 	once(uint32_t msec,H4_STD_FN fn,H4_STD_FN chain=nullptr);
+	H4_TIMER 	onceRandom(uint32_t Rmin,uint32_t Rmax,H4_STD_FN fn,H4_STD_FN chain=nullptr);
+	void	 	runNow(H4_STD_FN fn);
+```
+All of the above may be called as methods of a SmartPins object, i.e. you do not have to include a separate H4 object or include the H4 library - see example sketches.
+
+**N.B.** See https://github.com/philbowles/h4 for full description of timer / scheduler calls
+
+```c++
+
+SMARTPIN_STATE is defined as function<void(int)>
+SMARTPIN_STATE_VALUE os defined as function<void(int,int)>
+
+Constructor:
+
+		SmartPins(SMARTPIN_STATE_VALUE _cookedHook=nullptr, SMARTPIN_STATE_VALUE _rawHook=nullptr);
+    
+General Purpose:
+
+		int	 getValue(uint8_t _p);
+		void loop();
+		bool reconfigurePin(uint8_t _p,uint32_t v1, uint32_t v2=0);
+		void pulsePin(uint8_t pin,unsigned int ms);
+    
+Pin Methods:
+
+		void Debounced(uint8_t _p,uint8_t _mode,uint32_t _debounce,SMARTPIN_STATE _callback);	
+		void Encoder(uint8_t _pA,uint8_t _pB,uint8_t mode,SMARTPIN_STATE _callback);	
+		SmartPins::spEncoderAuto* EncoderAuto(uint8_t _pin,uint8_t _pinB,uint8_t _mode,SMARTPIN_STATE _callback,int _Vmin=0,int _Vmax=100,int _Vinc=1,int _Vset=0);	
+		void Latching(uint8_t _p,uint8_t _mode,uint32_t _debounce,SMARTPIN_STATE _callback);	
+		void Polled(uint8_t _p,uint8_t _mode,uint32_t freq,SMARTPIN_STATE _callback,bool adc=false);
+		void Raw(uint8_t _p,uint8_t _mode,SMARTPIN_STATE _callback);
+		void Reporting(uint8_t _p,uint8_t mode,uint32_t _debounce,uint32_t _freq,SMARTPIN_STATE_VALUE _callback);	
+		void Retriggering(uint8_t _p,uint8_t _mode,uint32_t _timeout,SMARTPIN_STATE _callback,uint32_t active=HIGH,uint32_t hyst=3000);	
+		void Timed(uint8_t _p,uint8_t mode,uint32_t _debounce,SMARTPIN_STATE_VALUE _callback);
+
+```
 
 (C) 2017 **Phil Bowles**
 philbowles2012@gmail.com
