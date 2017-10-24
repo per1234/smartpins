@@ -196,7 +196,7 @@ Based on a debounced pin. After first change, will call back only after [timeout
 Typical usage: PIR sensors. Although a typical PIR sensor will have these funtions built into the hardware, they are often physically inaccessible in IOT systems. A retriggering pin allows the PIR to function while being controlled / adjusted (possibly by e.g. MQTT) in software. If such an application is chosen, then the hardware should be set to NON-retriggering and timeout to the minimum value - at least less than the value chosen for the <timeout> parameter.
   
 Notes:
-A "truth table" is not additonally informative in this case. Note that unlike all the other pins types, a retriggering pin needs to know the difference between "on" and "off", "triggered" and "quiet". This is die to the fact that the device may indeed be in the "triggered" state at boot time (especially if that is performed manually). Since **smartpins** reacts to *changes* in state, if a PIR is already triggered at boot time, and **smartpins** is not aware, then all subsequent events will be interpreted "the wrong way round" and the timing sequence will be reversed. Thus an additional input parameter is required HIGH or LOW. A retriggered pin will ignore the first transition that is oposite in sense to this parameter. i.e. if the PIR is positive logic, provide a HIGH parameter...if it is already triggered HIGH at boot time, the 1st transiton will be to LOW and thus ignored.
+Unlike all the other pins types, a retriggering pin needs to know the difference between "on" and "off", "triggered" and "quiet". This is due to the fact that the device may indeed be in the "triggered" state at boot time (especially if that is performed manually). Since **smartpins** reacts to *changes* in state, if a PIR is already triggered at boot time, and **smartpins** is not aware, then all subsequent events will be interpreted "the wrong way round" and the timing sequence will be reversed. Thus an additional input parameter is required HIGH or LOW. A retriggered pin will ignore the first transition that is opposite in sense to this parameter. i.e. if the PIR is positive logic, provide a HIGH parameter...if it is already triggered HIGH at boot time, the 1st transiton will be to LOW and thus ignored.
 
 Positive logic timeline: [debounce]=15ms [timeout]=30000ms (30sec) [hysteresis]=2500ms (2.5sec)
 
@@ -204,8 +204,24 @@ T=0|T=5|T=8|T=10|T=12|T=15|...|T=500|T=1500|T=31500|H=2500|T=34000
 ---|---|---|----|----|----|---|-----|------|-------|---|---
 RAW|  1|  0|   1|   0|   1|111|    0|     1|      -|ignored|-
 COOKED|  -|  -|   -|   -|   1|---|    -|     -|      0|ignored|-
- B | O | U |  N |  C |  E |TRIG|     |RETRIG|EXPIRE|Dead|Alive
-   
+ B | O | U |  N |  C |  E |TRIG|     |RETRIG|EXPIRE|Dead|Active
+ 
+ 9. **ENCODER**
+ 
+Manages a standard rotary encoder. It will of course require *two* pins. For types that also include a push switch, a third (probably a debounced type) may also be added separately. Decodes dual input signals and calls back with +1 or -1 when a clockwise or anitclockwise "click" occurs. If this is the "wrong" sense for your application, simply reverese the two pin definitions.
+
+A *very* simplistic (and bounce-ignored) truth table:
+
+RAW A|RAW B|COOKED
+1|1| 
+1|0| 
+0|1| 
+0|0|+1
+1|0| 
+0|1| 
+1|1|-1
+
+
 
 ## Getting Started
 
