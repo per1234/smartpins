@@ -1,6 +1,6 @@
 ![smartpins Logo](/assets/pins.png)
-## ESP8266 Arduino library to manage GPIO pins
-# Introduction
+#ESP8266 Arduino library to manage GPIO pins
+##Introduction
 
 **smartPins** manages your input hardware/sensors for you. It removes the need to worry about ISRs, debouncing, background tasks, asychronous events and many other common issues.
 Put simply, smartPins takes care of pretty much anything you might want to do with an input pin and calls you back when something interesting happens. Its main purpose is to allow safe and robust hardware events in an asynchronous programming environment as is the ESP8266. That's a bit of a technical mouthful, it's much easier to understand with a simple code snippet. Imagine you have a very "bouncy" switch on pin 4. The following code is all you need to act upon switch events (cleanly) while also co-operating with ESP8266 background tasks:
@@ -216,9 +216,9 @@ Based on an encoder, callback returns an absolute value representing the positio
 
 Vmin, Vmax may be -ve. The encoder will function as long as the numerical condition Vmin < Vset < Vmax holds true. Thus as an example, imagine an encoderauto pin-pair with Vmin=-273 Vmax=0 Vset=-100 and Vinc=10. One click anticlockwise will callback with -110 and one click clockwise will callback with -90. If the clockwise rotation is continued, callbacks will occur with -80, -70, -60, -50, -40, -30, -20, -10, 0, 0, 0, 0.....  
 
-## Getting Started
+#Getting Started
 
-# Prerequisites
+##Prerequisites
 
 **smartPins** relies upon the H4 timer/scheduler library, which must be installed first:
 
@@ -229,7 +229,7 @@ Numerous tutorials exists explaing how to intall libraries into your Arduino IDE
 * https://www.baldengineer.com/installing-arduino-library-from-github.html
 * http://skaarhoj.com/wiki/index.php/Steps_to_install_an_Arduino_Library_from_GitHub
 
-## API reference
+#API reference
 
 **N.B.** You must call the smartPins `loop()` function from within the main loop of your program as often as possible. This runs the underlying H4 scheduler. Without this call, nothing will happen! Also, if your won loop or other code causes long delays, the pin timings will suffer. **smartpins** should ideally be deployed in applications that use only itself and the timer callbacks to run all code, avoiding any use of `delay()` calls. When used correctly, **smartpins** removes the need to ever call `delay()`. Avoid it like the plague.
 
@@ -237,25 +237,26 @@ Important note:
 
 You do **NOT** need to call the Arduino pinMode() function. **smartpins** does this for you already.
 
-#Inherited from H4:
+##Inherited from H4:
 
 H4_STD_FN is shorthand for `std::function<void(void)>`
 
 ```c++
-	H4_TIMER	every(uint32_t msec,H4_STD_FN fn);
-	H4_TIMER	everyRandom(uint32_t Rmin,uint32_t Rmax,H4_STD_FN fn);
-	void 		never();
-	void 		never(H4_TIMER uid);
-	H4_TIMER 	nTimes(uint32_t n,uint32_t msec,H4_STD_FN fn,H4_STD_FN chain=nullptr);
-	H4_TIMER 	nTimesRandom(uint32_t n,uint32_t msec,uint32_t Rmax,H4_STD_FN fn,H4_STD_FN chain=nullptr);
-	H4_TIMER 	once(uint32_t msec,H4_STD_FN fn,H4_STD_FN chain=nullptr);
-	H4_TIMER 	onceRandom(uint32_t Rmin,uint32_t Rmax,H4_STD_FN fn,H4_STD_FN chain=nullptr);
-	void	 	runNow(H4_STD_FN fn);
+H4_TIMER	every(uint32_t msec,H4_STD_FN fn);
+H4_TIMER	everyRandom(uint32_t Rmin,uint32_t Rmax,H4_STD_FN fn);
+void 		never();
+void 		never(H4_TIMER uid);
+H4_TIMER 	nTimes(uint32_t n,uint32_t msec,H4_STD_FN fn,H4_STD_FN chain=nullptr);
+H4_TIMER 	nTimesRandom(uint32_t n,uint32_t msec,uint32_t Rmax,H4_STD_FN fn,H4_STD_FN chain=nullptr);
+H4_TIMER 	once(uint32_t msec,H4_STD_FN fn,H4_STD_FN chain=nullptr);
+H4_TIMER 	onceRandom(uint32_t Rmin,uint32_t Rmax,H4_STD_FN fn,H4_STD_FN chain=nullptr);
+void	 	runNow(H4_STD_FN fn);
 ```
 All of the above may be called as methods of a SmartPins object, i.e. you do not have to include a separate H4 object or include the H4 library - see example sketches.
 
 **N.B.** See https://github.com/philbowles/h4 for full description of timer / scheduler calls
 
+##Directly from SmartPins
 ```c++
 
 SMARTPIN_STATE is defined as function<void(int)>
@@ -263,28 +264,29 @@ SMARTPIN_STATE_VALUE os defined as function<void(int,int)>
 
 Constructor:
 
-		SmartPins(SMARTPIN_STATE_VALUE _cookedHook=nullptr, SMARTPIN_STATE_VALUE _rawHook=nullptr);
+SmartPins(SMARTPIN_STATE_VALUE _cookedHook=nullptr, SMARTPIN_STATE_VALUE _rawHook=nullptr);
     
 General Purpose:
 
-		int	 getValue(uint8_t _p);
-		void loop();
-		bool reconfigurePin(uint8_t _p,uint32_t v1, uint32_t v2=0);
-		void pulsePin(uint8_t pin,unsigned int ms);
+int	 getValue(uint8_t _p);
+void 	loop();
+bool 	reconfigurePin(uint8_t _p,uint32_t v1, uint32_t v2=0);
+void 	pulsePin(uint8_t pin,unsigned int ms);
     
 Pin Methods:
 
-		void Debounced(uint8_t _p,uint8_t _mode,uint32_t _debounce,SMARTPIN_STATE _callback);	
-		void Encoder(uint8_t _pA,uint8_t _pB,uint8_t mode,SMARTPIN_STATE _callback);	
-		SmartPins::spEncoderAuto* EncoderAuto(uint8_t _pin,uint8_t _pinB,uint8_t _mode,SMARTPIN_STATE _callback,int _Vmin=0,int _Vmax=100,int _Vinc=1,int _Vset=0);	
-		void Latching(uint8_t _p,uint8_t _mode,uint32_t _debounce,SMARTPIN_STATE _callback);	
-		void Polled(uint8_t _p,uint8_t _mode,uint32_t freq,SMARTPIN_STATE _callback,bool adc=false);
-		void Raw(uint8_t _p,uint8_t _mode,SMARTPIN_STATE _callback);
-		void Reporting(uint8_t _p,uint8_t mode,uint32_t _debounce,uint32_t _freq,SMARTPIN_STATE_VALUE _callback);	
-		void Retriggering(uint8_t _p,uint8_t _mode,uint32_t _timeout,SMARTPIN_STATE _callback,uint32_t active=HIGH,uint32_t hyst=3000);	
-		void Timed(uint8_t _p,uint8_t mode,uint32_t _debounce,SMARTPIN_STATE_VALUE _callback);
+void Debounced(uint8_t _p,uint8_t _mode,uint32_t _debounce,SMARTPIN_STATE _callback);	
+void Encoder(uint8_t _pA,uint8_t _pB,uint8_t mode,SMARTPIN_STATE _callback);	
+SmartPins::spEncoderAuto* EncoderAuto(uint8_t _pin,uint8_t _pinB,uint8_t _mode,SMARTPIN_STATE _callback,int _Vmin=0,int _Vmax=100,int _Vinc=1,int _Vset=0);	
+void Latching(uint8_t _p,uint8_t _mode,uint32_t _debounce,SMARTPIN_STATE _callback);	
+void Polled(uint8_t _p,uint8_t _mode,uint32_t freq,SMARTPIN_STATE _callback,bool adc=false);
+void Raw(uint8_t _p,uint8_t _mode,SMARTPIN_STATE _callback);
+void Reporting(uint8_t _p,uint8_t mode,uint32_t _debounce,uint32_t _freq,SMARTPIN_STATE_VALUE _callback);	
+void Retriggering(uint8_t _p,uint8_t _mode,uint32_t _timeout,SMARTPIN_STATE _callback,uint32_t active=HIGH,uint32_t hyst=3000);	
+void Timed(uint8_t _p,uint8_t mode,uint32_t _debounce,SMARTPIN_STATE_VALUE _callback);
 
 ```
+
 
 (C) 2017 **Phil Bowles**
 philbowles2012@gmail.com
