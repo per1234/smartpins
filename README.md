@@ -54,7 +54,7 @@ The additional handlers for the variety of things you can do with a hardware pin
 - "Encoder" pin pairs - Attach a rotary encoder to two pins and you get called when it clicks in either direction
 - "Auto Encoder" - returns an absolute value when the position changes, e.g. like an old-fashioned volume control
 
-It also includes "hooks" which allow the user to do things like this, monitoring the state of the pins in (near) real-time:
+It also includes "hooks" which allow the user to do things like this, monitoring the state of the pins in (near) real-time. This graphic display example is taken from a device running the soon-to-be-released Esparto v2.0 (an all-in-one ESP8266 MQTT handler - *very basic "proof-of-concept" version available here, without web interface* https://github.com/philbowles/esparto )
 
 ![esparto](/assets/esparto.png)
 
