@@ -1,8 +1,8 @@
 ![smartpins Logo](/assets/pins.png)
-# ESP8266 Arduino library to manage GPIO pins
+# SmartPins - an ESP8266 Arduino library to manage GPIO pins
 ## Introduction
 
-**smartPins** manages your input hardware/sensors for you. It removes the need to worry about ISRs, debouncing, background tasks, asychronous events and many other common issues.
+**SmartPins** manages your input hardware/sensors for you. It removes the need to worry about ISRs, debouncing, background tasks, asychronous events and many other common issues.
 Put simply, smartPins takes care of pretty much anything you might want to do with an input pin and calls you back when something interesting happens. Its main purpose is to allow safe and robust hardware events in an asynchronous programming environment as is the ESP8266. That's a bit of a technical mouthful, it's much easier to understand with a simple code snippet. Imagine you have a very "bouncy" switch on pin 4. The following code is all you need to act upon switch events (cleanly) while also co-operating with ESP8266 background tasks:
 
 ```c++
@@ -24,7 +24,9 @@ void loop() {
   SP.loop();
 }
 ```
-It's about much more than just debouncing, it has numerous different input styles and - more importanly it puts all asynchronous input events into a single queue. This makes sure that all your code runs from the main loop thread, which reduces / prevents a number of common problems.
+# In detail / additional functionality
+
+**SmartPins** provides much more than just debouncing: it has numerous different input styles and - more importanly it puts all asynchronous input events into a single queue. This makes sure that all your code runs from the main loop thread, which reduces / prevents a number of common problems.
 
 The additional handlers for the variety of things you can do with a hardware pin:
 
@@ -42,9 +44,7 @@ It also includes "hooks" which allow the user to do things like this, monitoring
 
 ![esparto](/assets/esparto.png)
 
-# In detail / additional functionality
-
-While you can use **smartpins** "out-of-the-box" as in the example above, it helps to understand two concepts:
+While you can use **SmartPins** "out-of-the-box" as in the example above, it helps to understand two concepts:
 
 1) It is an extension of the H4 timer/scheduler library (https://github.com/philbowles/h4) so it provides all the functions of that library in addition to the pin management. These include flexible and adaptable timing functions that can call class methods or `std::function`s when the timer "fires".
 
@@ -56,9 +56,9 @@ The "cooked" state has a different meaning for each different pin type.
 
 Perhaps the easiest pin type to explain this is the "Latching" pin. A "latch" is something that stays in one state until it is commanded to change to another. Imagine then that you only have a simple and cheap "tactile" or "tact" momentary push button. The first issue is that they "bounce" - usually rather a lot. Imagine also you want one press of the button to turn an LED on and a second (later) press to turn it off.
 
-Forget the debouncing for a second (or about 15ms...a nerd joke) the "raw" state of the pin is on/off for each press. (it may also be off/on if it is "pulled-up" - **smartpins** doesn't care which, it reacts to *changes* in the state). So we have to show it is "latched" after one on/off sequence and then *un*latched after a subsequent on/off sequence. Hence we have four raw inputs, but only two meaningful outputs. The meaningful outputs are the "cooked" states.
+Forget the debouncing for a second (or about 15ms...a nerd joke) the "raw" state of the pin is on/off for each press. (it may also be off/on if it is "pulled-up" - **SmartPins** doesn't care which, it reacts to *changes* in the state). So we have to show it is "latched" after one on/off sequence and then *un*latched after a subsequent on/off sequence. Hence we have four raw inputs, but only two meaningful outputs. The meaningful outputs are the "cooked" states.
 
-Back to the real world: the above is only true with an ideal switch that never bounces. So in reality we may get 10 or 15 on/off transitions for the press followed by 7 or 8 for the release, depending on just how "bouncy" the switch is. **smartpins** irons all of that out and calls you once and only once, providing you with its own internal state "latched" (=1). Next time, it calls you back with "unlatched" (=0).
+Back to the real world: the above is only true with an ideal switch that never bounces. So in reality we may get 10 or 15 on/off transitions for the press followed by 7 or 8 for the release, depending on just how "bouncy" the switch is. **SmartPins** irons all of that out and calls you once and only once, providing you with its own internal state "latched" (=1). Next time, it calls you back with "unlatched" (=0).
 
 Referring back to the image of the LED monitor above, the top row of LEDs shows the "raw" state and the bottom row is "cooked". If you had a latching pin defined, the top "raw" LED would flicker on/off (usually at least once, due to the bouncing) as you press and release it, but the bottom "cooked" LED will stay on. Later, when you repeat this, the raw pin will again flicker on/off but now the cooked pin will go off.
 
@@ -79,7 +79,7 @@ For the sake of convenience, positive logic has been chosen but if the pin were 
 
 # Supported Hardware
 
-**smartpins** has been tested on the following hardware:
+**SmartPins** has been tested on the following hardware:
 
 * ESP-01
 * ESP-01S
@@ -196,7 +196,7 @@ Based on a debounced pin. After first change, will call back only after [timeout
 Typical usage: PIR sensors. Although a typical PIR sensor will have these funtions built into the hardware, they are often physically inaccessible in IOT systems. A retriggering pin allows the PIR to function while being controlled / adjusted (possibly by e.g. MQTT) in software. If such an application is chosen, then the hardware should be set to NON-retriggering and timeout to the minimum value - at least less than the value chosen for the <timeout> parameter.
   
 Notes:
-Unlike all the other pins types, a retriggering pin needs to know the difference between "on" and "off", "triggered" and "quiet". This is due to the fact that the device may indeed be in the "triggered" state at boot time (especially if that is performed manually). Since **smartpins** reacts to *changes* in state, if a PIR is already triggered at boot time, and **smartpins** is not aware, then all subsequent events will be interpreted "the wrong way round" and the timing sequence will be reversed. Thus an additional input parameter is required HIGH or LOW. A retriggered pin will ignore the first transition that is opposite in sense to this parameter. i.e. if the PIR is positive logic, provide a HIGH parameter...if it is already triggered HIGH at boot time, the 1st transiton will be to LOW and thus ignored.
+Unlike all the other pins types, a retriggering pin needs to know the difference between "on" and "off", "triggered" and "quiet". This is due to the fact that the device may indeed be in the "triggered" state at boot time (especially if that is performed manually). Since **SmartPins** reacts to *changes* in state, if a PIR is already triggered at boot time, and **SmartPins** is not aware, then all subsequent events will be interpreted "the wrong way round" and the timing sequence will be reversed. Thus an additional input parameter is required HIGH or LOW. A retriggered pin will ignore the first transition that is opposite in sense to this parameter. i.e. if the PIR is positive logic, provide a HIGH parameter...if it is already triggered HIGH at boot time, the 1st transiton will be to LOW and thus ignored.
 
 Positive logic timeline: [debounce]=15ms [timeout]=30000ms (30sec) [hysteresis]=2500ms (2.5sec)
 
@@ -220,7 +220,7 @@ Vmin, Vmax may be -ve. The encoder will function as long as the numerical condit
 
 ## Prerequisites
 
-**smartPins** relies upon the H4 timer/scheduler library, which must be installed first:
+**SmartPins** relies upon the H4 timer/scheduler library, which must be installed first:
 
 * https://github.com/philbowles/h4
 
@@ -231,11 +231,11 @@ Numerous tutorials exists explaing how to intall libraries into your Arduino IDE
 
 # API reference
 
-**N.B.** You must call the smartPins `loop()` function from within the main loop of your program as often as possible. This runs the underlying H4 scheduler. Without this call, nothing will happen! Also, if your won loop or other code causes long delays, the pin timings will suffer. **smartpins** should ideally be deployed in applications that use only itself and the timer callbacks to run all code, avoiding any use of `delay()` calls. When used correctly, **smartpins** removes the need to ever call `delay()`. Avoid it like the plague.
+**N.B.** You must call the smartPins `loop()` function from within the main loop of your program as often as possible. This runs the underlying H4 scheduler. Without this call, nothing will happen! Also, if your won loop or other code causes long delays, the pin timings will suffer. **SmartPins** should ideally be deployed in applications that use only itself and the timer callbacks to run all code, avoiding any use of `delay()` calls. When used correctly, **SmartPins** removes the need to ever call `delay()`. Avoid it like the plague.
 
 Important note:
 
-You do **NOT** need to call the Arduino pinMode() function. **smartpins** does this for you already.
+You do **NOT** need to call the Arduino pinMode() function. **SmartPins** does this for you already.
 
 ## Inherited from H4:
 
@@ -252,7 +252,7 @@ H4_TIMER 	once(uint32_t msec,H4_STD_FN fn,H4_STD_FN chain=nullptr);
 H4_TIMER 	onceRandom(uint32_t Rmin,uint32_t Rmax,H4_STD_FN fn,H4_STD_FN chain=nullptr);
 void	 	runNow(H4_STD_FN fn);
 ```
-All of the above may be called as methods of a SmartPins object, i.e. you do not have to include a separate H4 object or include the H4 library - see example sketches.
+All of the above may be called as methods of a **SmartPins** object, i.e. you do not have to include a separate H4 object or include the H4 library - see example sketches.
 
 **N.B.** See https://github.com/philbowles/h4 for full description of timer / scheduler calls
 
@@ -268,7 +268,7 @@ SmartPins(SMARTPIN_STATE_VALUE _cookedHook=nullptr, SMARTPIN_STATE_VALUE _rawHoo
     
 General Purpose:
 
-int	 getValue(uint8_t _p);
+int	  getValue(uint8_t _p);
 void 	loop();
 bool 	reconfigurePin(uint8_t _p,uint32_t v1, uint32_t v2=0);
 void 	pulsePin(uint8_t pin,unsigned int ms);
@@ -285,7 +285,39 @@ void Reporting(uint8_t _p,uint8_t mode,uint32_t _debounce,uint32_t _freq,SMARTPI
 void Retriggering(uint8_t _p,uint8_t _mode,uint32_t _timeout,SMARTPIN_STATE _callback,uint32_t active=HIGH,uint32_t hyst=3000);	
 void Timed(uint8_t _p,uint8_t mode,uint32_t _debounce,SMARTPIN_STATE_VALUE _callback);
 
+EncoderAuto methods:
+
+
 ```
+
+**Constructor**
+
+`SmartPins(SMARTPIN_STATE_VALUE _cookedHook=nullptr, SMARTPIN_STATE_VALUE _rawHook=nullptr);`
+
+Both parameters are optional. If either function is provided it will be called on each and every pin transition. Thus the user must take great care to minimise the time spent in these functions or they could add greatly to the "lag" between the true event occuring and the user callback being executed.
+
+In either case, the function must be void(int,int) the first parameter being the ping number and the second current state of the pin abd the second being its value. For rawHook this will only ever be 0 or 1. For the cooked hook this will be whatever type of value the pin type returns, e.g. +1/-1 for an encoder pin-pair, a millisecond value for timed pin, 0/1 for a latching pin etc.
+
+**getValue** `int	 getValue(uint8_t _p)`
+
+Returns the current value of pin p. See **Constructor** for the range of values returned
+
+**loop** `void loop()`
+
+Runs the underlying scheduler. Must be called from the main loop as often as possible.
+
+**reconfigurePin** `reconfigurePin(uint8_t _p,uint32_t v1, uint32_t v2=0)`
+
+Changes the values associated with an already configured pin p. v1 and v2 have different meanings for ech pin type as follows:
+
+Pin Type|v1|v2
+---|---|---
+raw|-|-
+
+
+
+
+
 
 
 (C) 2017 **Phil Bowles**
