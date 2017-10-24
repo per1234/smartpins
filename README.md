@@ -1,6 +1,6 @@
 ![smartpins Logo](/assets/pins.png)
-#ESP8266 Arduino library to manage GPIO pins
-##Introduction
+# ESP8266 Arduino library to manage GPIO pins
+## Introduction
 
 **smartPins** manages your input hardware/sensors for you. It removes the need to worry about ISRs, debouncing, background tasks, asychronous events and many other common issues.
 Put simply, smartPins takes care of pretty much anything you might want to do with an input pin and calls you back when something interesting happens. Its main purpose is to allow safe and robust hardware events in an asynchronous programming environment as is the ESP8266. That's a bit of a technical mouthful, it's much easier to understand with a simple code snippet. Imagine you have a very "bouncy" switch on pin 4. The following code is all you need to act upon switch events (cleanly) while also co-operating with ESP8266 background tasks:
