@@ -231,11 +231,9 @@ Numerous tutorials exists explaing how to intall libraries into your Arduino IDE
 
 # API reference
 
-**N.B.** You must call the smartPins `loop()` function from within the main loop of your program as often as possible. This runs the underlying H4 scheduler. Without this call, nothing will happen! Also, if your won loop or other code causes long delays, the pin timings will suffer. **SmartPins** should ideally be deployed in applications that use only itself and the timer callbacks to run all code, avoiding any use of `delay()` calls. When used correctly, **SmartPins** removes the need to ever call `delay()`. Avoid it like the plague.
+**N.B.** You must call the smartPins `loop()` function from within the main loop of your program as often as possible. This runs the underlying H4 scheduler. Without this call, nothing will happen! Also, if your own loop or other code causes long delays, the pin timings will suffer. **SmartPins** should ideally be deployed in applications that use only itself and the timer callbacks to run all code, avoiding any use of `delay()` calls. When used correctly, **SmartPins** removes the need to ever call `delay()`. Avoid it like the plague.
 
-Important note:
-
-You do **NOT** need to call the Arduino pinMode() function. **SmartPins** does this for you already.
+You do **NOT** need to call the Arduino pinMode() function before any of the *input* pin functions. **SmartPins** does this for you already.
 
 ## Inherited from H4:
 
