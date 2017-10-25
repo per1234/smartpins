@@ -296,13 +296,13 @@ void center();
 
 **Constructor**
 
-`SmartPins(SMARTPIN_STATE_VALUE _cookedHook=nullptr, SMARTPIN_STATE_VALUE _rawHook=nullptr);`
+`SmartPins(SMARTPIN_STATE_VALUE cookedHook=nullptr, SMARTPIN_STATE_VALUE rawHook=nullptr);`
 
-Both parameters are optional. If either function is provided it will be called on each and every pin transition. Thus the user must take great care to minimise the time spent in these functions or they could add greatly to the "lag" between the true event occuring and the user callback being executed.
+Both parameters are optional. If either function is provided it will be called on each and every pin transition. The user must take great care to minimise the time spent in these functions or they could add greatly to the "lag" between the true event occuring and the user callback being executed.
 
-In either case, the function must be void(int,int) the first parameter being the ping number and the second current state of the pin abd the second being its value. For rawHook this will only ever be 0 or 1. For the cooked hook this will be whatever type of value the pin type returns, e.g. +1/-1 for an encoder pin-pair, a millisecond value for timed pin, 0/1 for a latching pin etc.
+In either case, the function must be void(int,int) the first parameter being the pin number and the second being its value. For rawHook this will only ever be 0 or 1. For the cooked hook this will be whatever type of value the pin type returns, e.g. +1/-1 for an encoder pin-pair, a millisecond value for timed pin, 0/1 for a latching pin etc.
 
-**getValue** `int	 getValue(uint8_t _p)`
+**getValue** `int	 getValue(uint8_t p)`
 
 Returns the current value of pin p. See **Constructor** for the range of values returned
 
@@ -310,9 +310,9 @@ Returns the current value of pin p. See **Constructor** for the range of values 
 
 Runs the underlying scheduler. Must be called from the main loop as often as possible.
 
-**reconfigurePin** `void reconfigurePin(uint8_t _p,uint32_t v1, uint32_t v2=0)`
+**reconfigurePin** `void reconfigurePin(uint8_t p,uint32_t v1, uint32_t v2=0)`
 
-Changes the values associated with an already configured pin p. v1 and v2 have different meanings for ech pin type as follows:
+Changes the values associated with an already configured pin p. v1 and v2 have different meanings for each pin type as follows:
 
 Pin Type|v1|v2
 ---|---|---
@@ -322,50 +322,50 @@ polled|frequency|-
 timed|debounce time|
 reporting|debounce time|frequency
 latching|debounce time|
-retriggered|timeout|hysteresis
+retriggering|timeout|hysteresis
 encoder|-|-
 encoderauto*|Vmin|Vmax
 
-* encoderauto will be autmatically "centered", i.e. Vset = (Vmin+Vmax) / 2 after this call
+*encoderauto will be autmatically "centered", i.e. Vset = (Vmin+Vmax) / 2 after this call
 
-**pulsePin** `void pulsePin(uint8_t pin,unsigned int ms)`
+**pulsePin** `void pulsePin(uint8_t p,unsigned int ms)`
 
-Sends a single ms millisecond pulse to pin, which must have been configured previously using standard Arduino `pinMode(pin,OUTPUT);`
-**WARNING** the pulse must be kept extremely short. This function calls `delay(ms)` and thus ling pulses will a) interfer with timing and b) may cause WDT problems / crashes if used indiscriminately.
+Sends a single ms millisecond pulse to pin p, which must have been configured previously using standard Arduino `pinMode(pin,OUTPUT);`
+**WARNING** the pulse must be kept extremely short. This function calls `delay(ms)` and thus long pulses will a) interfere with timing and b) may cause WDT problems / crashes if used indiscriminately.
 
 The parameters to the pin methods should be obvious when read in conjuntion with the pin descriptions above. Common / frequent values are:
 * p is the pin number
-* mode is the INPUT, INPUT_PULLUP  value as for standard Arduino `pinmode()` function
+* mode is the INPUT or INPUT_PULLUP  value as for standard Arduino `pinmode()` function
 * debounce is the debounce time in milliseconds
 * callback is the name of the callback function
 Others will be detailed where they are not obvious
 
-**Debounced** `void Debounced(uint8_t _p,uint8_t _mode,uint32_t _debounce,SMARTPIN_STATE _callback);`
+**Debounced** `void Debounced(uint8_t p,uint8_t mode,uint32_t debounce,SMARTPIN_STATE callback);`
 
-**Encoder** `void Encoder(uint8_t _pA,uint8_t _pB,uint8_t mode,SMARTPIN_STATE _callback);`
+**Encoder** `void Encoder(uint8_t pA,uint8_t pB,uint8_t mode,SMARTPIN_STATE callback);`
 pA and pB are the *two* hardware pins attached to the encoder. They must *both* be wired electrically the same, since the input mode applies to both pins.
 
-**EncoderAuto** `SmartPins::spEncoderAuto* EncoderAuto(uint8_t _pinA,uint8_t _pinB,uint8_t _mode,SMARTPIN_STATE _callback,int _Vmin=0,int _Vmax=100,int _Vinc=1,int _Vset=0);`
-Returns a pointer to an EncoderAuto object, which can be used to call additional methods which only apply to this pin type:
+**EncoderAuto** `SmartPins::spEncoderAuto* EncoderAuto(uint8_t pA,uint8_t _pB,uint8_t mode,SMARTPIN_STATE callback,int Vmin=0,int Vmax=100,int Vinc=1,int Vset=0);`
+Returns a pointer to an SmartPins::EncoderAuto object, which can be used to call additional methods which only apply to this pin type:
 `void setMin();`  Set encoder to its minmum value.
 `void setMax();`  Set encoder to its maximum value.
 `void setPercent(uint32_t pc);` Set encoder to a position pc% between Vmin and Vmax.
 `void center();`  Set encoder to its "center" value - same as  setPercent(50) i.e. (Vmin+Vmax) /2.
 
-**Latching** `void Latching(uint8_t _p,uint8_t _mode,uint32_t _debounce,SMARTPIN_STATE _callback);`
+**Latching** `void Latching(uint8_t p,uint8_t mode,uint32_t debounce,SMARTPIN_STATE callback);`
 
-**Polled** `void Polled(uint8_t _p,uint8_t _mode,uint32_t freq,SMARTPIN_STATE _callback,bool adc=false);`
+**Polled** `void Polled(uint8_t p,uint8_t mode,uint32_t freq,SMARTPIN_STATE callback,bool adc=false);`
 freq is the frequency in milliseconds with which the pin value will be checked. adc=true causes the pin to be treated as an ADC pin and thus this should only be set when p=A0 (or 17 on many systems). Doing otherwise resukts in undefined behaviour
 
-**Raw** `void Raw(uint8_t _p,uint8_t _mode,SMARTPIN_STATE _callback);`
+**Raw** `void Raw(uint8_t p,uint8_t mode,SMARTPIN_STATE callback);`
 
-**Reporting** `void Reporting(uint8_t _p,uint8_t mode,uint32_t _debounce,uint32_t _freq,SMARTPIN_STATE_VALUE _callback);`
+**Reporting** `void Reporting(uint8_t p,uint8_t mode,uint32_t debounce,uint32_t freq,SMARTPIN_STATE_VALUE callback);`
 freq is the frequency with which the callback will be called while the pin remains in the changed state
 
-**Retriggering** `void Retriggering(uint8_t _p,uint8_t _mode,uint32_t _timeout,SMARTPIN_STATE _callback,uint32_t active=HIGH,uint32_t hyst=3000);`
-active is the state when triggered, hyst is the nysteresis timeout
+**Retriggering** `void Retriggering(uint8_t p,uint8_t mode,uint32_t timeout,SMARTPIN_STATE callback,uint32_t active=HIGH,uint32_t hyst=3000);`
+active is the state when triggered, hyst is the hysteresis timeout in milliseconds
 
-**Timed** `void Timed(uint8_t _p,uint8_t mode,uint32_t _debounce,SMARTPIN_STATE_VALUE _callback);`
+**Timed** `void Timed(uint8_t p,uint8_t mode,uint32_t debounce,SMARTPIN_STATE_VALUE callback);`
 
 
 (C) 2017 **Phil Bowles**
