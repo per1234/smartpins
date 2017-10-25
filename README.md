@@ -60,9 +60,9 @@ It also includes "hooks" which allow the user to do things like this, monitoring
 
 While you can use **SmartPins** "out-of-the-box" as in the example above, it helps to understand two concepts:
 
-1) It is an extension of the H4 timer/scheduler library (https://github.com/philbowles/h4) so it provides all the functions of that library in addition to the pin management. These include flexible and adaptable timing functions that can call class methods or `std::function`s when the timer "fires".
+1) It is an extension of the H4 timer/scheduler library (https://github.com/philbowles/h4) so it provides all the functions of that library in addition to the pin management. These include flexible and adaptable timing functions that can call class methods or `std::function`s (even "normal" functions too!) when the timer "fires".
 
-2) It introduces the concept or "raw" and "cooked" pin states. The "raw" state is the actual physical state of the pin in as close as possible to real-time. All the managed pins are polled as fast as the processor allows - during testing on a variety of hardware (see list below) running at CPU speed 80MHz this is typically about 40000 times per second, or about every 25us. So while it is not as "instantaneous" as an interrupt, it works for the majority of popular hardware types. This is why the phrase "near real-time" is used here. On the plus side, it removes the need to worry about Interrupt Service Routines (ISR) and the complexities / common errors that they bring.It is important to understand that all of this functionality adds an amount of time to the actual event, so users may notice some "lag" in very rapid systems. The added latency however is extremely small and is the price that one pays for robustness, ease-of-use and absence of WDT resets and/or other common problems. Nothing in life is free...
+2) It introduces the concept or "raw" and "cooked" pin states. The "raw" state is the actual physical state of the pin in as close as possible to real-time. All the managed pins are polled as fast as the processor (and your own main loop) allows - during testing on a variety of hardware running at CPU speed 80MHz this is typically about 40000 times per second, or about every 25us. So while it is not as "instantaneous" as an interrupt, it works for the majority of popular input devices. This is why the phrase "near real-time" is used here. On the plus side, it removes the need to worry about Interrupt Service Routines (ISRs) and the complexities / common errors that they bring. It is important to understand that all of this functionality adds an amount of time to the actual event, so users may notice some "lag" in very rapid systems. The added latency however is extremely small and is the price that one pays for robustness, ease-of-use and absence of WDT resets and/or other common problems. Nothing in life is free...
 
 The "cooked" state has a different meaning for each different pin type.
 
@@ -70,13 +70,13 @@ The "cooked" state has a different meaning for each different pin type.
 
 Perhaps the easiest pin type to explain this is the "Latching" pin. A "latch" is something that stays in one state until it is commanded to change to another. Imagine then that you only have a simple and cheap "tactile" or "tact" momentary push button. The first issue is that they "bounce" - usually rather a lot. Imagine also you want one press of the button to turn an LED on and a second (later) press to turn it off.
 
-Forget the debouncing for a second (or about 15ms...a nerd joke) the "raw" state of the pin is on/off for each press. (it may also be off/on if it is "pulled-up" - **SmartPins** doesn't care which, it reacts to *changes* in the state). So we have to show it is "latched" after one on/off sequence and then *un*latched after a subsequent on/off sequence. Hence we have four raw inputs, but only two meaningful outputs. The meaningful outputs are the "cooked" states.
+Forget the debouncing for a second (or usually about 15ms - it's a nerd joke...) the "raw" state of the pin is on/off for each press. (it may also be off/on if it is "pulled-up" - **SmartPins** doesn't care which, it reacts to *changes* in the pin state). So we have to show it is "latched" after one on/off sequence and then *un*latched after a subsequent on/off sequence. Hence we have four raw inputs, but only two "meaningful" outputs. The meaningful outputs are the "cooked" states.
 
 Back to the real world: the above is only true with an ideal switch that never bounces. So in reality we may get 10 or 15 on/off transitions for the press followed by 7 or 8 for the release, depending on just how "bouncy" the switch is. **SmartPins** irons all of that out and calls you once and only once, providing you with its own internal state "latched" (=1). Next time, it calls you back with "unlatched" (=0).
 
 Referring back to the image of the LED monitor above, the top row of LEDs shows the "raw" state and the bottom row is "cooked". If you had a latching pin defined, the top "raw" LED would flicker on/off (usually at least once, due to the bouncing) as you press and release it, but the bottom "cooked" LED will stay on. Later, when you repeat this, the raw pin will again flicker on/off but now the cooked pin will go off.
 
-A "truth table" for a latching pin would look something like this:
+A "state table" for a latching pin would look something like this:
 
 RAW| COOKED
 ---|---
@@ -95,7 +95,7 @@ For the sake of convenience, positive logic has been chosen but if the pin were 
 
 ## 1. **RAW**
 
-As the name suggests, there are no "cooked" events - the callback runs on every* transition of the pin. Callback parameter is current state: 1 or 0.
+As the name suggests, there are no "cooked" events - the callback runs on every* transition of the pin. Callback parameter is current state: 1 or 0. [* providing they occur within thw 25us "window". **SmartPins** will not funtion correctly with devices which require a fatser reaction time than this]
 
 RAW| COOKED
 ---|---
@@ -106,7 +106,7 @@ RAW| COOKED
 
 Ignores "bouncy" transitions for a period of N ms. Thus the pin has to stay in the changed state for at least N ms before a cooked event will fire.
 
-Typical usage: Standard input pushbutton or switch, requiring near-instant action.
+Typical usage: Standard debounced input pushbutton or switch, requiring near-instant action.
 
 RAW| COOKED
 ---|---
@@ -121,7 +121,7 @@ RAW| COOKED
 
 Callback fires on a timer, returning instantaneous state: for digital pins this will be 0|1, for A0 it will be the absolute current ADC reading. Transitions in between timer "ticks" will be ignored.
 
-Typical usage: Slow-changing sensors, e.g. daylight sensors, temperature sensors. POLLED pins have an additional parameter specifying an analog read vs the more common digital read. The fact that minor occasional transitions in between ticks are ignored is useful for adding "hysteres" to the pin or "smoothing out" minor wobbles.
+Typical usage: Slow-changing sensors, e.g. daylight sensors, temperature sensors. POLLED pins have an additional parameter specifying an analog read vs the more common digital read. The fact that minor occasional transitions in between ticks are ignored is useful for adding "hysteresis" to the pin or "smoothing out" minor wobbles.
 
 RAW| COOKED
 ---|---
@@ -135,11 +135,11 @@ timer fires|0
 
 ## 4. **TIMED**
 
-Based on a debounced pin (for N ms). Callback returns the current state AND the number of milliseconds that pin was held in the changed state
+Based on a debounced pin (for N ms). Callback returns the current state AND the number of milliseconds that pin was held in the changed state.
 
 Typical usage: To differentiate between a "short" and a "long" event, e.g. a button press. For example, in the author's home automation devices, a "short" press switches the device on or off. A "medium" press reboots the device and "long" press causes a factory reset.
 
-It is up to the user to define what "short" "medium" and "long" mean, by comparing the return value from the callback and taking the relevant action
+It is up to the user to define what "short" "medium" and "long" mean, by comparing the return value from the callback and taking the relevant action.
 
 RAW| COOKED|VALUE
 ---|---|---
@@ -151,7 +151,7 @@ e.g. 127ms elapses*|...|...
 e.g. 1438ms elapse*|...|...
 0|0|1438
 
-* **NB** debouncing complication not shown
+* **N.B.** debouncing complication not shown
 
 ## 5. **REPORTING**
 
@@ -159,7 +159,7 @@ Based on a timed pin (for N ms). Callback returns the current state AND the numb
 
 Typical usage: To differentiate between a "short" and a "long" event, but to also get notified periodically while e.g. button is held down, allowing other actions to take place - perhaps to signify button state. In the author's HA system (see TIMED button above) when a button is held down for longer than a "short" period, an LED starts flashing. The longer the button is held, the faster the LED flashes, to signify its changing status to the user.
 
-Example with repoorting frequency of 100ms (1 sec)
+Example with reporting frequency of 1000ms (1 sec)
 
 RAW| COOKED|VALUE
 ---|---|---
@@ -189,14 +189,14 @@ any amount of time elapses...|...
 ...|ignored for N ms
 0|0
 
-## 7. **RETRIGGERED**
+## 7. **RETRIGGERING**
 
-Based on a debounced pin. After first change, will call back only after [timeout] ms have elapsed. If subsequent "triggering" transitions occur before [timeout] has expired, then the internal timer is restarted. Thus the "untriggered" state can only ever occur <timeout> ms after the last (or only) inital trigger event. It also has an additional hysteresis timer (which can be zero) - this is the "deadzone" time between triggers, i.e. the pin will not react again after the previous "untrigger" until [hysteresis] ms have elapsed. 
+Based on a debounced pin. After first change, will call back only after [timeout] ms have elapsed. If subsequent "triggering" transitions occur before [timeout] has expired, then the internal timer is restarted. Thus the "untriggered" state can only ever occur [timeout] ms after the last (or only) inital trigger event. It also has an additional hysteresis timer (which can be zero) - this is the "deadzone" time between triggers, i.e. the pin will not react again after the previous "untrigger" until [hysteresis] ms have elapsed. 
 
-Typical usage: PIR sensors. Although a typical PIR sensor will have these funtions built into the hardware, they are often physically inaccessible in IOT systems. A retriggering pin allows the PIR to function while being controlled / adjusted (possibly by e.g. MQTT) in software. If such an application is chosen, then the hardware should be set to NON-retriggering and timeout to the minimum value - at least less than the value chosen for the <timeout> parameter.
+Typical usage: PIR sensors. Although a typical PIR sensor will have these funtions built into the hardware, they are often physically inaccessible in IOT systems. A retriggering pin allows the PIR to function while being controlled / adjusted (possibly by e.g. MQTT) in software. If such an application is chosen, then the hardware should be set to NON-retriggering and the *hardware* timeout set to its minimum value - it should be less than the value chosen for the [timeout] parameter.
   
 Notes:
-Unlike all the other pins types, a retriggering pin needs to know the difference between "on" and "off", "triggered" and "quiet". This is due to the fact that the device may indeed be in the "triggered" state at boot time (especially if that is performed manually). Since **SmartPins** reacts to *changes* in state, if a PIR is already triggered at boot time, and **SmartPins** is not aware, then all subsequent events will be interpreted "the wrong way round" and the timing sequence will be reversed. Thus an additional input parameter is required HIGH or LOW. A retriggered pin will ignore the first transition that is opposite in sense to this parameter. i.e. if the PIR is positive logic, provide a HIGH parameter...if it is already triggered HIGH at boot time, the 1st transiton will be to LOW and thus ignored.
+Unlike all the other pins types, a retriggering pin needs to know the difference between "on" and "off", "triggered" and "quiet". This is due to the fact that the device may indeed be in the "triggered" state at boot time (especially if that is performed manually). Since **SmartPins** reacts to *changes* in state, if a PIR is already triggered at boot time, and **SmartPins** is not aware, then all subsequent events will be interpreted "the wrong way round" and the timing sequence will be reversed. Thus an additional input parameter is required HIGH or LOW. A retriggering pin will ignore the first transition that is opposite in sense to this parameter. i.e. if the PIR is positive logic, provide a HIGH parameter...then if it is already triggered HIGH at boot time, the 1st transiton will be to LOW and thus ignored.
 
 Positive logic timeline: [debounce]=15ms [timeout]=30000ms (30sec) [hysteresis]=2500ms (2.5sec)
 
@@ -212,9 +212,9 @@ Manages a standard rotary encoder. It will of course require *two* pins. For typ
 
 ## 9. **ENCODERAUTO**
 
-Based on an encoder, callback returns an absolute value representing the position. You provide four additional parameters Vmin, Vmax, Vset and Vinc. Vmin is the minimum value the pin(s) will return, Vmax  the maximum and Vset is where you require the "current" position to be. Obviously, at all times, Vset must be between Vmin and Vmax. Vinc is the amount by which the encoder increments (or decrements) with each click. Defaults are Vmin=0, Vmax=100, Vset=50, i.e. the mid-point and Vinc=1. One click anticlockwise will callback with 49, 1 clicks clockwise will callback with 51
+Based on an encoder, callback returns an absolute value representing its position. You provide four additional parameters Vmin, Vmax, Vset and Vinc. Vmin is the minimum value the pin(s) will return, Vmax  the maximum and Vset is where you require the "current" position to be. Obviously, at all times, Vset must be between Vmin and Vmax. Vinc is the amount by which the encoder increments (or decrements) with each click. Defaults are Vmin=0, Vmax=100, Vset=50, i.e. the mid-point and Vinc=1. One click anticlockwise will callback with 49, 1 click clockwise will callback with 51. The returned value will  never exceed Vmin or Vmax: if the encoder is turned "past" these points, it will simply continue to return the min or max value.
 
-Vmin, Vmax may be -ve. The encoder will function as long as the numerical condition Vmin < Vset < Vmax holds true. Thus as an example, imagine an encoderauto pin-pair with Vmin=-273 Vmax=0 Vset=-100 and Vinc=10. One click anticlockwise will callback with -110 and one click clockwise will callback with -90. If the clockwise rotation is continued, callbacks will occur with -80, -70, -60, -50, -40, -30, -20, -10, 0, 0, 0, 0.....  
+Vmin, Vmax may be -ve. The encoder will function as long as the numerical condition Vmin < Vset < Vmax holds true. As an example, imagine an encoderauto pin-pair with Vmin=-273 Vmax=0 Vset=-100 and Vinc=10. One click anticlockwise will callback with -110 and one click clockwise will callback with -90. If the clockwise rotation is continued, callbacks will occur with -80, -70, -60, -50, -40, -30, -20, -10, 0, 0, 0, 0.....  
 
 # Getting Started
 
@@ -285,8 +285,12 @@ void Reporting(uint8_t _p,uint8_t mode,uint32_t _debounce,uint32_t _freq,SMARTPI
 void Retriggering(uint8_t _p,uint8_t _mode,uint32_t _timeout,SMARTPIN_STATE _callback,uint32_t active=HIGH,uint32_t hyst=3000);	
 void Timed(uint8_t _p,uint8_t mode,uint32_t _debounce,SMARTPIN_STATE_VALUE _callback);
 
-EncoderAuto methods:
+EncoderAuto-only methods:
 
+void setMin();
+void setMax();
+void setPercent(uint32_t pc);
+void center();
 
 ```
 
@@ -342,7 +346,11 @@ Others will be detailed where they are not obvious
 pA and pB are the *two* hardware pins attached to the encoder. They must *both* be wired electrically the same, since the input mode applies to both pins.
 
 **EncoderAuto** `SmartPins::spEncoderAuto* EncoderAuto(uint8_t _pinA,uint8_t _pinB,uint8_t _mode,SMARTPIN_STATE _callback,int _Vmin=0,int _Vmax=100,int _Vinc=1,int _Vset=0);`
-Returns a pointer to an EncoderAuto object, which can be used aletr to call additional methods which only apply to this pin type
+Returns a pointer to an EncoderAuto object, which can be used to call additional methods which only apply to this pin type:
+`void setMin();`  Set encoder to its minmum value.
+`void setMax();`  Set encoder to its maximum value.
+`void setPercent(uint32_t pc);` Set encoder to a position pc% between Vmin and Vmax.
+`void center();`  Set encoder to its "center" value - same as  setPercent(50) i.e. (Vmin+Vmax) /2.
 
 **Latching** `void Latching(uint8_t _p,uint8_t _mode,uint32_t _debounce,SMARTPIN_STATE _callback);`
 
