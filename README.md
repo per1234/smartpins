@@ -151,7 +151,7 @@ e.g. 127ms elapses*|...|...
 e.g. 1438ms elapse*|...|...
 0|0|1438
 
-* **N.B.** debouncing complication not shown
+*debouncing complication not shown
 
 ## 5. **REPORTING**
 
@@ -171,7 +171,7 @@ e.g. 1000ms elapses*|...|...
 e.g. 438ms elapse*|...|...
 0|0|2438
 
-* **NB** debouncing complication not shown
+*debouncing complication not shown
 
 ## 6. **LATCHING**
 
@@ -324,7 +324,7 @@ retriggering|timeout|hysteresis
 encoder|-|-
 encoderauto*|Vmin|Vmax
 
-*encoderauto will be autmatically "centered", i.e. Vset = (Vmin+Vmax) / 2 after this call
+*encoderauto will be automatically "centered", i.e. Vset = (Vmin+Vmax) / 2 after this call
 
 **pulsePin** `void pulsePin(uint8_t p,unsigned int ms)`
 
