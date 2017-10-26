@@ -1,0 +1,46 @@
+#######################################
+# Syntax Coloring Map For SmartPins
+#######################################
+
+#######################################
+# Library (KEYWORD1)
+#######################################
+
+SmartPins	KEYWORD1
+
+#######################################
+# Datatypes (KEYWORD1)
+#######################################
+
+SmartPins	KEYWORD1
+
+#######################################
+# Methods and Functions (KEYWORD2)
+#######################################
+Debounced	KEYWORD2
+Encoder	KEYWORD2	
+every	KEYWORD2
+everyRandom	KEYWORD2
+getValue	KEYWORD2
+Latching	KEYWORD2
+loop	KEYWORD2
+never	KEYWORD2
+nTimes	KEYWORD2
+nTimesRandom	KEYWORD2
+once	KEYWORD2
+onceRandom	KEYWORD2
+pulsePin	KEYWORD2
+Polled	KEYWORD2
+Raw	KEYWORD2
+reconfigurePin	KEYWORD2
+Reporting	KEYWORD2
+Retriggering	KEYWORD2
+runNow	KEYWORD2
+Timed	KEYWORD2
+
+#######################################
+# Constants (LITERAL1)
+#######################################
+
+SMARTPIN_STATE	LITERAL1
+SMARTPIN_STATE_VALUE	LITERAL1
