@@ -347,13 +347,21 @@ Others will be detailed where they are not obvious
 pA and pB are the *two* hardware pins attached to the encoder. They must *both* be wired electrically the same, since the input mode applies to both pins.
 
 **EncoderAuto** `SmartPins::spEncoderAuto* EncoderAuto(uint8_t pA,uint8_t _pB,uint8_t mode,SMARTPIN_STATE callback,int Vmin=0,int Vmax=100,int Vinc=1,int Vset=0);`
+
 Returns a pointer to an SmartPins::EncoderAuto object, which can be used to call additional methods which only apply to this pin type:
+
 `void center();`  Set encoder to its "center" value - same as  setPercent(50) i.e. (Vmin+Vmax) /2.
+
 `int getValue();`  RFeturns current value.
+
 `void reconfigure(int Vmin,int Vmax,int Vinc,int Vset=0);` "Does what it says on the tin..."
+
 `void setMin();`  Set encoder to its minimum value.
+
 `void setMax();`  Set encoder to its maximum value.
+
 `void setPercent(uint32_t pc);` Set encoder to a position pc% between Vmin and Vmax.
+
 `void setValue(int v);` Set current value.
 
 **Latching** `void Latching(uint8_t p,uint8_t mode,uint32_t debounce,SMARTPIN_STATE callback);`
@@ -372,7 +380,7 @@ active is the state when triggered, hyst is the hysteresis timeout in millisecon
 **Timed** `void Timed(uint8_t p,uint8_t mode,uint32_t debounce,SMARTPIN_STATE_VALUE callback);`
 
 # Code Examples:
-* [Raw](../tree/master/examples/00_Raw/00_Raw.ino)
+* [Raw](../blob/master/examples/00_Raw/00_Raw.ino)
 
 
 (C) 2017 **Phil Bowles**
