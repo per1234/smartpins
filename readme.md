@@ -102,6 +102,8 @@ RAW| COOKED
 1|-
 0|-
 
+### Example [Raw](../master/examples/00_Raw/00_Raw.ino)
+
 ## 2. **DEBOUNCED**
 
 Ignores "bouncy" transitions for a period of N ms. Thus the pin has to stay in the changed state for at least N ms before a cooked event will fire.
@@ -116,6 +118,8 @@ RAW| COOKED
 0|-
 ...|ignored for N ms
 0|0
+
+### Example [Debounced](../master/examples/01_Debounced/01_Debounced.ino)
 
 ## 3. **POLLED**
 
@@ -132,6 +136,8 @@ timer fires|1
 0|-
 ...|...
 timer fires|0
+
+### Example [Polled](../master/examples/02_Polled/02_Polled.ino)
 
 ## 4. **TIMED**
 
@@ -153,6 +159,8 @@ e.g. 1438ms elapse*|...|...
 
 *debouncing complication not shown
 
+### Example * [Timed](../master/examples/03_Timed/03_Timed.ino)
+
 ## 5. **REPORTING**
 
 Based on a timed pin (for N ms). Callback returns the current state AND the number of milliseconds that pin was held in the changed state for every amount of "frequency" parameter.
@@ -173,6 +181,8 @@ e.g. 438ms elapse*|...|...
 
 *debouncing complication not shown
 
+### Example [Reporting](../master/examples/04_Reporting/04_Reporting.ino)
+
 ## 6. **LATCHING**
 
 Based on a debounced pin. Turns a momentary button/switch into a latching button/switch
@@ -188,6 +198,8 @@ any amount of time elapses...|...
 1|-
 ...|ignored for N ms
 0|0
+
+### Example [Latching](../master/examples/05_Latching/05_Latching.ino)
 
 ## 7. **RETRIGGERING**
 
@@ -206,15 +218,21 @@ RAW|  1|  0|   1|   0|   1|111|    0|     1|      -|ignored|-
 COOKED|  -|  -|   -|   -|   1|---|    -|     -|      0|ignored|-
  B | O | U |  N |  C |  E |TRIG|     |RETRIG|EXPIRE|Dead|Active
  
+ ### Example [Retriggering](../master/examples/06_Retriggering/06_Retriggering.ino)
+ 
  ## 8. **ENCODER**
  
 Manages a standard rotary encoder. It will of course require *two* pins. For types that also include a push switch, a third (probably a debounced type) may also be added separately. Decodes dual input signals and calls back with +1 or -1 when a clockwise or anticlockwise "click" occurs. If this is the "wrong" sense for your application, simply reverese the two pin definitions.
 
+### Example [Encoder](../master/examples/07_Encoder/07_Encoder.ino)
+
 ## 9. **ENCODERAUTO**
 
-Based on an encoder, callback returns an absolute value representing its position. You provide four additional parameters Vmin, Vmax, Vset and Vinc. Vmin is the minimum value the pin(s) will return, Vmax  the maximum and Vset is where you require the "current" position to be. Obviously, at all times, Vset must be between Vmin and Vmax. Vinc is the amount by which the encoder increments (or decrements) with each click. Defaults are Vmin=0, Vmax=100, Vset=50, i.e. the mid-point and Vinc=1. One click anticlockwise will callback with 49, 1 click clockwise will callback with 51. The returned value will  never exceed Vmin or Vmax: if the encoder is turned "past" these points, it will simply continue to return the min or max value.
+Based on an encoder, callback returns an absolute value representing its position. You provide four additional parameters Vmin, Vmax, Vset and Vinc. Vmin is the minimum value the pin(s) will return, Vmax  the maximum and Vset is where you require the "current" position to be. Obviously, at all times, Vset must be between Vmin and Vmax. Vinc is the amount by which the encoder increments (or decrements) with each click. Defaults are Vmin=0, Vmax=100, Vset=50, i.e. the mid-point and Vinc=1. One click anticlockwise will callback with 49, 1 click clockwise will callback with 51. The returned value will  never exceed Vmin or Vmax: if the encoder is turned "past" these points, it will simply not return a value.
 
-Vmin, Vmax may be -ve. The encoder will function as long as the numerical condition Vmin < Vset < Vmax holds true. As an example, imagine an encoderauto pin-pair with Vmin=-273 Vmax=0 Vset=-100 and Vinc=10. One click anticlockwise will callback with -110 and one click clockwise will callback with -90. If the clockwise rotation is continued, callbacks will occur with -80, -70, -60, -50, -40, -30, -20, -10, 0, 0, 0, 0.....  
+Vmin, Vmax may be -ve. The encoder will function as long as the numerical condition Vmin < Vset < Vmax holds true. As an example, imagine an encoderauto pin-pair with Vmin=-273 Vmax=0 Vset=-100 and Vinc=10. One click anticlockwise will callback with -110 and one click clockwise will callback with -90. If the clockwise rotation is continued, callbacks will occur with -80, -70, -60 etc until zero is reached, when no further callbacks will occur until it is turned in the opposite direction.
+
+### Example [EncoderAuto](../master/examples/08_EncoderAuto/08_EncoderAuto.ino)
 
 # Getting Started
 
@@ -380,6 +398,9 @@ active is the state when triggered, hyst is the hysteresis timeout in millisecon
 **Timed** `void Timed(uint8_t p,uint8_t mode,uint32_t debounce,SMARTPIN_STATE_VALUE callback);`
 
 # Code Examples:
+
+It is recommended that you work through these examples in order, as they get more complex. They also include examples of the timer / scheduler functions. The EncoderAuto example contains a hidden "Easter Egg" - if you understand the code fully, you will discover a "secret" method of triggering a congratulation message. Have fun!
+
 * [Raw](../master/examples/00_Raw/00_Raw.ino)
 * [Debounced](../master/examples/01_Debounced/01_Debounced.ino)
 * [Polled](../master/examples/02_Polled/02_Polled.ino)
