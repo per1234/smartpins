@@ -3,7 +3,7 @@
 ## Introduction
 
 **SmartPins** manages your input hardware/sensors for you. It removes the need to worry about ISRs, debouncing, background tasks, asychronous events and many other common issues.
-Put simply, smartPins takes care of pretty much anything you might want to do with an input pin and calls you back when something interesting happens. Its main purpose is to allow safe and robust hardware events in an asynchronous programming environment as is the ESP8266. That's a bit of a technical mouthful, it's much easier to understand with a simple code snippet. Imagine you have a very "bouncy" switch on pin 4. The following code is all you need to act upon switch events (cleanly) while also co-operating with ESP8266 background tasks:
+Put simply, smartPins takes care of pretty much anything you might want to do with an input pin and calls you back when something interesting happens. Its main purpose is to allow safe and robust hardware events in the asynchronous programming environment that is the ESP8266. That's a bit of a technical mouthful, it's much easier to understand with a simple code snippet. Imagine you have a very "bouncy" switch on pin 4. The following code is all you need to act upon switch events (cleanly) while also co-operating with ESP8266 background tasks:
 
 ```c++
 #include <SmartPins.h>
@@ -380,7 +380,16 @@ active is the state when triggered, hyst is the hysteresis timeout in millisecon
 **Timed** `void Timed(uint8_t p,uint8_t mode,uint32_t debounce,SMARTPIN_STATE_VALUE callback);`
 
 # Code Examples:
-* [Raw](../blob/master/examples/00_Raw/00_Raw.ino)
+* [Raw](../master/examples/00_Raw/00_Raw.ino)
+* [Debounced](../master/examples/01_Debounced/01_Debounced.ino)
+* [Polled](../master/examples/02_Polled/02_Polled.ino)
+* [Timed](../master/examples/03_Timed/03_Timed.ino)
+* [Reporting](../master/examples/04_Reporting/04_Reporting.ino)
+* [Latching](../master/examples/05_Latching/05_Latching.ino)
+* [Retriggering](../master/examples/06_Retriggering/06_Retriggering.ino)
+* [Encoder](../master/examples/07_Encoder/07_Encoder.ino)
+* [EncoderAuto](../master/examples/08_EncoderAuto/08_EncoderAuto.ino)
+* [Hooks](../master/examples/09_Hooks/09_Hooks.ino)
 
 
 (C) 2017 **Phil Bowles**
