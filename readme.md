@@ -371,6 +371,9 @@ active is the state when triggered, hyst is the hysteresis timeout in millisecon
 
 **Timed** `void Timed(uint8_t p,uint8_t mode,uint32_t debounce,SMARTPIN_STATE_VALUE callback);`
 
+# Code Examples:
+* [Raw](../tree/master/examples/00_Raw/00_Raw.ino)
+
 
 (C) 2017 **Phil Bowles**
 philbowles2012@gmail.com
