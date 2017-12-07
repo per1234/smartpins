@@ -192,7 +192,9 @@ class SmartPins: public H4 {
 							bouncing=true;
 							smartPin<T>::sp->once(debounce,bind([](_deSpike<T>* me){
 									me->bouncing=false;
-									if(me->state==me->savedState) me->prepared(me->state);
+									if(me->state==me->savedState) {
+										me->prepared(me->state);
+									}
 							},this));
 						}
 					}
@@ -304,41 +306,29 @@ class SmartPins: public H4 {
 			class spRetriggering: public smartPin<SMARTPIN_STATE>{
 								uint32_t    timeout;
 								uint32_t	active;
-								uint32_t	hysteresis;
 					volatile 	uint32_t    timer=0;
-					volatile	uint32_t	hTimer=0;
 					
 					virtual void cooked(int hilo){ callback(hilo);	}
 			
 					void raw(int hilo){
-						if(!hTimer){
-							if(hilo==active){
-								if(timer) sp->never(timer);
-								else prepared(hilo);
-								timer=sp->once(timeout,bind([](spRetriggering* me){
-												me->timer=0;
-												if(me->state!=me->active) {
-													me->prepared(me->state);
-													me->hTimer=me->sp->once(me->hysteresis,bind([](spRetriggering* me){
-														me->hTimer=0;
-														},me));			  
-																  
-												}
-										},this));
-							}
-							else if(!timer) prepared(hilo); // inactive after timer expiry
+						if(hilo==active){
+							if(timer) sp->never(timer);
+							prepared(hilo);
+							timer=sp->once(timeout,bind([](spRetriggering* me){
+											me->timer=0;
+											if(me->state!=me->active) me->prepared(me->state);
+									},this));
 						}
+						else if(!timer) prepared(hilo); // inactive after timer expiry
 					}
 				public:
 					int getValue(){ return static_cast<int>(timer!=0); }
 					void reconfigure(int v1, int v2) {
 						timeout=v1;
-						hysteresis=v2;
 						}
-					spRetriggering(uint8_t _p,uint8_t mode,uint32_t _timeout,SMARTPIN_STATE _callback,uint32_t _active,uint32_t _hyst,SmartPins* _sp): smartPin<SMARTPIN_STATE>(_p,mode,_callback,_sp) {
+					spRetriggering(uint8_t _p,uint8_t mode,uint32_t _timeout,SMARTPIN_STATE _callback,uint32_t _active,SmartPins* _sp): smartPin<SMARTPIN_STATE>(_p,mode,_callback,_sp) {
 						style=SMARTPIN_STYLE_RETRIGGERING;
 						timeout=_timeout;
-						hysteresis=_hyst;
 						active=_active;
 						if(state==_active) raw(_active); // already triggered at startup
 					 }
@@ -447,7 +437,7 @@ class SmartPins: public H4 {
 		void Polled(uint8_t _p,uint8_t _mode,uint32_t freq,SMARTPIN_STATE _callback,bool adc=false);
 		void Raw(uint8_t _p,uint8_t _mode,SMARTPIN_STATE _callback);
 		void Reporting(uint8_t _p,uint8_t mode,uint32_t _debounce,uint32_t _freq,SMARTPIN_STATE_VALUE _callback);	
-		void Retriggering(uint8_t _p,uint8_t _mode,uint32_t _timeout,SMARTPIN_STATE _callback,uint32_t active=HIGH,uint32_t hyst=3000);	
+		void Retriggering(uint8_t _p,uint8_t _mode,uint32_t _timeout,SMARTPIN_STATE _callback,uint32_t active=HIGH);	
 		void Timed(uint8_t _p,uint8_t mode,uint32_t _debounce,SMARTPIN_STATE_VALUE _callback);
 	protected:
 		void setCookedHook(SMARTPIN_STATE_VALUE fn){cookedHookFn=fn;}

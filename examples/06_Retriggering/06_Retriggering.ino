@@ -23,7 +23,7 @@ SOFTWARE.
 */
 #include <SmartPins.h>
 /*
- *   You will need a pushbutton for this demo, preferably one that "bounces" a lot
+ *   You will need a pushbutton for this demo
  *   
  *   change the PUSHBUTTON value below to match the chosen pin
  *   if you use an external PULLUP (10k recommended) use mode INPUT
@@ -33,27 +33,20 @@ SOFTWARE.
 SmartPins sp;
 #define PUSHBUTTON  0
 #define TIMEOUT 10000
-#define HYSTERESIS 1000
 
 void pinChange(int hilo){
   Serial.printf("T=%d Retriggering: state=%d\n",millis(),hilo);
-  if(hilo==HIGH) Serial.printf("T=%d Button will be dead for a short while - toggle it rapidly\n",millis());
-  else Serial.printf("T=%d Triggered - try retriggering before timeout expires!\n",millis());
 }
 
 void setup(){
     Serial.begin(74880);
-    Serial.printf("SmartPins Retriggering Example, pin=%d timeout=%dms hysteresis=%dms\n",PUSHBUTTON,TIMEOUT,HYSTERESIS); 
-    sp.Retriggering(PUSHBUTTON,INPUT_PULLUP,TIMEOUT,pinChange,LOW,HYSTERESIS);       // no external pullup resistor
-// sometime between 30s and 1 minute change hysteresis value to half
-    sp.onceRandom(30000,60000,[](){
-      Serial.printf("T=%d set hysteresis to %d\n",millis(),HYSTERESIS / 2);
-      sp.reconfigurePin(PUSHBUTTON,TIMEOUT,HYSTERESIS / 2);
-      });
-// sometime between 1:10s and 1:30 change timeout value to half WARNING this will reset HYSTERESIS to original value!
+    Serial.printf("SmartPins Retriggering Example, pin=%d timeout=%dms\n",PUSHBUTTON,TIMEOUT); 
+    sp.Retriggering(PUSHBUTTON,INPUT_PULLUP,TIMEOUT,pinChange,LOW);       // no external pullup resistor
+
+// sometime between 1:10s and 1:30 change timeout value to half 
     sp.onceRandom(70000,90000,[](){
       Serial.printf("T=%d set timeout to %d\n",millis(),TIMEOUT / 2);
-      sp.reconfigurePin(PUSHBUTTON,TIMEOUT / 2,HYSTERESIS);
+      sp.reconfigurePin(PUSHBUTTON,TIMEOUT / 2);
       });
 }
 

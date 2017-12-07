@@ -35,7 +35,7 @@ Raw	KEYWORD2
 reconfigurePin	KEYWORD2
 Reporting	KEYWORD2
 Retriggering	KEYWORD2
-runNow	KEYWORD2
+queueFunction	KEYWORD2
 Timed	KEYWORD2
 
 #######################################

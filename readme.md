@@ -1,5 +1,5 @@
 ![smartpins Logo](/assets/pins.png)
-# SmartPins - an ESP8266 Arduino library to manage GPIO pins
+# SmartPins - an ESP8266 Arduino library to manage GPIO pins (v0.2.2)
 ## Introduction
 
 **SmartPins** manages your input hardware/sensors for you. It removes the need to worry about ISRs, debouncing, background tasks, asychronous events and many other common issues.
@@ -34,7 +34,7 @@ void loop() {
 * Sonoff S20
 * Sonoff SV
 * Wemos D1 mini
-* Nodedmuc v0.9
+* NodeMCU v0.9
 
 There is no reason why it shouldn't run on any other ESP8266 boards
 
@@ -210,13 +210,13 @@ Typical usage: PIR sensors. Although a typical PIR sensor will have these funtio
 Notes:
 Unlike all the other pins types, a retriggering pin needs to know the difference between "on" and "off", "triggered" and "quiet". This is due to the fact that the device may indeed be in the "triggered" state at boot time (especially if that is performed manually). Since **SmartPins** reacts to *changes* in state, if a PIR is already triggered at boot time, and **SmartPins** is not aware, then all subsequent events will be interpreted "the wrong way round" and the timing sequence will be reversed. Thus an additional input parameter is required HIGH or LOW. A retriggering pin will ignore the first transition that is opposite in sense to this parameter. i.e. if the PIR is positive logic, provide a HIGH parameter...then if it is already triggered HIGH at boot time, the 1st transiton will be to LOW and thus ignored.
 
-Positive logic timeline: [debounce]=15ms [timeout]=30000ms (30sec) [hysteresis]=2500ms (2.5sec)
+Positive logic timeline: [debounce]=15ms [timeout]=30000ms (30sec)
 
-T=0|T=5|T=8|T=10|T=12|T=15|...|T=500|T=1500|T=31500|H=2500|T=34000
----|---|---|----|----|----|---|-----|------|-------|---|---
-RAW|  1|  0|   1|   0|   1|111|    0|     1|      -|ignored|-
-COOKED|  -|  -|   -|   -|   1|---|    -|     -|      0|ignored|-
- B | O | U |  N |  C |  E |TRIG|     |RETRIG|EXPIRE|Dead|Active
+T=0|T=5|T=8|T=10|T=12|T=15|...|T=500|T=1500|T=31500|T=34000
+---|---|---|----|----|----|---|-----|------|-------|---
+RAW|  1|  0|   1|   0|   1|111|    0|     1|      -|-
+COOKED|  -|  -|   -|   -|   1|---|    -|     -|      0|-
+ B | O | U |  N |  C |  E |TRIG|     |RETRIG|EXPIRE|Active
  
  ### Example [Retriggering](../master/examples/06_Retriggering/06_Retriggering.ino)
  

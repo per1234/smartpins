@@ -54,7 +54,6 @@ void ICACHE_FLASH_ATTR SmartPins::pulsePin(uint8_t pin,unsigned int ms){
 bool ICACHE_FLASH_ATTR SmartPins::reconfigurePin(uint8_t _p,int v1, int v2){
 	auto p=find_if(hwPins.begin(), hwPins.end(),[&](const hwPin* tp) { return _p==tp->p; });
 	if(p!=hwPins.end()) {
-		Serial.printf("reconfigurePin %d v1=%d v2=%d\n",_p,v1,v2);
 	   (*p)->reconfigure(v1,v2);
 	   return true;
 	}
@@ -109,8 +108,8 @@ void SmartPins::Reporting(uint8_t _p,uint8_t _mode,uint32_t _debounce,uint32_t _
 //
 //	Retriggering
 //
-void SmartPins::Retriggering(uint8_t _p,uint8_t _mode,uint32_t _timeout,SMARTPIN_STATE _callback,uint32_t _active,uint32_t _hyst){
-	hwPins.push_back(new spRetriggering(_p,_mode,_timeout,_callback,_active,_hyst,this));	
+void SmartPins::Retriggering(uint8_t _p,uint8_t _mode,uint32_t _timeout,SMARTPIN_STATE _callback,uint32_t _active){
+	hwPins.push_back(new spRetriggering(_p,_mode,_timeout,_callback,_active,this));	
 }
 //
 //	Timed
