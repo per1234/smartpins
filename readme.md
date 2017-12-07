@@ -266,7 +266,7 @@ H4_TIMER 	nTimes(uint32_t n,uint32_t msec,H4_STD_FN fn,H4_STD_FN chain=nullptr);
 H4_TIMER 	nTimesRandom(uint32_t n,uint32_t msec,uint32_t Rmax,H4_STD_FN fn,H4_STD_FN chain=nullptr);
 H4_TIMER 	once(uint32_t msec,H4_STD_FN fn,H4_STD_FN chain=nullptr);
 H4_TIMER 	onceRandom(uint32_t Rmin,uint32_t Rmax,H4_STD_FN fn,H4_STD_FN chain=nullptr);
-void	 	runNow(H4_STD_FN fn);
+void	 	queueFunction(H4_STD_FN fn);
 ```
 All of the above may be called as methods of a **SmartPins** object, i.e. you do not have to include a separate H4 object or include the H4 library - see example sketches.
 
