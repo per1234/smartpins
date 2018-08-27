@@ -40,13 +40,13 @@ void setupHardware(){
 *	Flexibility: create apps from simple "blinky" to fully-featured, complex, resilient IOT / home automation firmware
 *	Tested on a wide variety of hardware: ESP-01, SONOFF, Wemos D1, NodeMCU etc
 ## Rapid development
-*	Most common errors and ‚Äúgotchas‚Äù avoided
+*	Most common errors and ìgotchasî avoided
 *	Many flexible input-pin options pre-configured e.g. fully debounced rotary encoder support with a single line of code
 *	Create MQTT controlled firmware in only 15 lines of code
 *	User code hugely simplified, consisting mainly of short callback functions
 *	Several flexible asynchronous LED flashing functions including slow PWM, arbitrary pattern e.g. "... --- ..." for SOS, 
-*	Modular: Esparto ‚ÄúLite‚Äù / Esparto WiFi / Esparto MQTT: use only what you need / your experience matches
-## ‚ÄúIndustrial strength‚Äù
+*	Modular: Esparto ìLiteî / Esparto WiFi / Esparto MQTT: use only what you need / your experience matches
+## ìIndustrial strengthî
 *	Voice-driven compatibility with Amazon Alexa (via Belkin Wemo emulation)
 *	Copes resiliently with WiFi outage or total network loss, reconnecting automatically without requiring reboot
 *	Hardware features continue to function at all times irrespective of connection status
