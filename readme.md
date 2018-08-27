@@ -2,7 +2,10 @@
 
 # Introduction
 
-## SmartPins and H4 libraries are essential components of Esparto v2.0
+## SmartPins and H4 libraries are essential components of Esparto v2.0 They are designed to be used in the Arduino IDE 1.8.6 with the esp8266 core 2.4.2
+
+* https://www.arduino.cc/en/Main/Software
+* https://github.com/esp8266/arduino
 
 They each need to be downloaded and installed prior to Esparto v2.0. They will be supported only as part of the Esparto project, so any isses / requests / etc should be made only on the Esparto pages.
 
