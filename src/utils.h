@@ -27,7 +27,7 @@ SOFTWARE.
 //			utility
 //
 #include<Arduino.h>
-#include<FS.H>
+#include<FS.h>
 #include<vector>
 #include<string>
 using namespace std;
