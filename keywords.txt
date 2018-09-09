@@ -42,7 +42,7 @@ stopLED	KEYWORD2
 stringFromInt	KEYWORD2
 ThreeStage	KEYWORD2
 throttlePin	KEYWORD2
-Timed	KEYWORD2	KEYWORD2
+Timed	KEYWORD2
 
 #######################################
 # Constants (LITERAL1)
